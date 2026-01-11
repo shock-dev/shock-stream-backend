@@ -1,8 +1,7 @@
 import { Injectable, OnModuleDestroy, OnModuleInit } from '@nestjs/common'
 import { PrismaPg } from '@prisma/adapter-pg'
 import { PrismaClient } from '@prisma/generated/client'
-
-import { DB_URL } from '@/prisma.config'
+import process from 'node:process'
 
 @Injectable()
 export class PrismaService
@@ -11,7 +10,7 @@ export class PrismaService
 {
     constructor() {
         const adapter = new PrismaPg({
-            url: DB_URL
+            url: process.env['POSTGRES_URI']
         })
         super({ adapter })
     }

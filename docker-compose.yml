@@ -16,12 +16,27 @@ services:
       - "${POSTGRES_PORT}:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
-
     networks:
       - shock-stream_backend
 
+  redis:
+    container_name: redis
+    image: redis:7.0
+    restart: always
+    ports:
+      - "${REDIS_PORT}:6379"
+    command: >
+      redis-server
+      --requirepass ${REDIS_PASSWORD}
+    volumes:
+      - redis_data:/data
+    networks:
+      - shock-stream_backend
+
+
 volumes:
   postgres_data:
+  redis_data:
 
 networks:
   shock-stream_backend:
