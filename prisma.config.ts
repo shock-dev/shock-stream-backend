@@ -9,7 +9,7 @@ const HOST = process.env['POSTGRES_HOST']
 const PORT = process.env['POSTGRES_PORT']
 const DB = process.env['POSTGRES_DB']
 
-const DB_URL = `postgresql://${USER}:${PASSWORD}@${HOST}:${PORT}/${DB}?schema=public`
+export const DB_URL = `postgresql://${USER}:${PASSWORD}@${HOST}:${PORT}/${DB}?schema=public`
 
 export default defineConfig({
     schema: 'prisma/schema.prisma',
