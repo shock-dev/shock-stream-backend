@@ -4,14 +4,15 @@ import { ConfigModule, ConfigService } from '@nestjs/config'
 import { GraphQLModule } from '@nestjs/graphql'
 
 import { getGraphqlConfig } from '@/src/core/config/graphql.config'
+import { AccountModule } from '@/src/modules/auth/account/account.module'
 import { IS_DEV_ENV } from '@/src/shared/utils/is-dev.util'
 
 import { PrismaModule } from './prisma/prisma.module'
-import { RedisModule } from './redis/redis.module';
+import { RedisModule } from './redis/redis.module'
 
 @Module({
     imports: [
-        ConfigModule.forRoot({ ignoreEnvFile: IS_DEV_ENV, isGlobal: true }),
+        ConfigModule.forRoot({ ignoreEnvFile: !IS_DEV_ENV, isGlobal: true }),
         GraphQLModule.forRootAsync({
             driver: ApolloDriver,
             imports: [ConfigModule],
@@ -19,7 +20,8 @@ import { RedisModule } from './redis/redis.module';
             useFactory: getGraphqlConfig
         }),
         PrismaModule,
-        RedisModule
+        RedisModule,
+        AccountModule
     ],
     controllers: [],
     providers: []
