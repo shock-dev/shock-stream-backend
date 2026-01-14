@@ -7,6 +7,6 @@ import { AccountService } from './account.service'
 
 @Module({
     providers: [AccountResolver, AccountService, PasswordService],
-    exports: [AccountService]
+    exports: [AccountService, PasswordService]
 })
 export class AccountModule {}
