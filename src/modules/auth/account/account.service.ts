@@ -8,12 +8,14 @@ import { PasswordService } from '@/src/modules/auth/account/services/password.se
 @Injectable()
 export class AccountService {
     public constructor(
-        private readonly prismaService: PrismaService,
+        private readonly prisma: PrismaService,
         private readonly passwordService: PasswordService
     ) {}
 
-    public async findAll() {
-        return this.prismaService.user.findMany()
+    public async me(id: string) {
+        return this.prisma.user.findUnique({
+            where: { id }
+        })
     }
 
     public async create(input: CreateUserInput) {
@@ -22,7 +24,7 @@ export class AccountService {
         const hashedPassword = await this.passwordService.hash(password)
 
         try {
-            return await this.prismaService.user.create({
+            return await this.prisma.user.create({
                 data: {
                     username,
                     email,
