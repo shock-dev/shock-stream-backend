@@ -1,6 +1,7 @@
 import { ValidationPipe } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
 import { NestFactory } from '@nestjs/core'
+import { NestExpressApplication } from '@nestjs/platform-express'
 import { RedisStore } from 'connect-redis'
 import cookieParser from 'cookie-parser'
 import session from 'express-session'
@@ -12,7 +13,7 @@ import { parseBoolean } from '@/src/shared/utils/parce-boolean'
 import { CoreModule } from './core/core.module'
 
 async function bootstrap() {
-    const app = await NestFactory.create(CoreModule)
+    const app = await NestFactory.create<NestExpressApplication>(CoreModule)
 
     const config = app.get(ConfigService)
     const redis = app.get(RedisService)
@@ -50,6 +51,8 @@ async function bootstrap() {
         credentials: true,
         exposedHeaders: ['set-cookie']
     })
+
+    app.set('trust proxy', true)
 
     await app.listen(config.getOrThrow<number>('APPLICATION_PORT'))
 }

@@ -5,6 +5,7 @@ import type { Request, Response } from 'express'
 import { PrismaService } from '@/src/core/prisma/prisma.service'
 import { PasswordService } from '@/src/modules/auth/account/services/password.service'
 import { LoginInput } from '@/src/modules/auth/session/inputs/login.input'
+import { getSessionMetadata } from '@/src/shared/utils/session-metadata.util'
 
 @Injectable()
 export class SessionService {
@@ -14,7 +15,7 @@ export class SessionService {
         private readonly config: ConfigService
     ) {}
 
-    async login(req: Request, input: LoginInput) {
+    async login(req: Request, input: LoginInput, userAgent: string) {
         const { login, password } = input
         const { session } = req
 
@@ -40,9 +41,12 @@ export class SessionService {
             throw new UnauthorizedException('Неверный логин или пароль')
         }
 
+        const metadata = getSessionMetadata(req, userAgent)
+
         session.user = {
             id: user.id,
-            createdAt: new Date()
+            createdAt: new Date(),
+            metadata
         }
 
         await new Promise<void>((resolve, reject) => {
