@@ -4,12 +4,14 @@ import { Prisma } from '@prisma/generated/client'
 import { PrismaService } from '@/src/core/prisma/prisma.service'
 import { CreateUserInput } from '@/src/modules/auth/account/inputs/create-user.input'
 import { PasswordService } from '@/src/modules/auth/account/services/password.service'
+import { VerificationService } from '@/src/modules/auth/verification/verification.service'
 
 @Injectable()
 export class AccountService {
     public constructor(
         private readonly prisma: PrismaService,
-        private readonly passwordService: PasswordService
+        private readonly passwordService: PasswordService,
+        private readonly verificationService: VerificationService
     ) {}
 
     public async me(id: string) {
@@ -24,19 +26,18 @@ export class AccountService {
         const hashedPassword = await this.passwordService.hash(password)
 
         try {
-            return await this.prisma.user.create({
+            const user = await this.prisma.user.create({
                 data: {
                     username,
                     email,
                     displayName: username,
                     password: hashedPassword
-                },
-                select: {
-                    id: true,
-                    username: true,
-                    email: true
                 }
             })
+
+            await this.verificationService.sendVerificationToken(user)
+
+            return user
         } catch (error) {
             if (
                 error instanceof Prisma.PrismaClientKnownRequestError &&

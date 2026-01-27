@@ -1,7 +1,7 @@
 import {
+    BadRequestException,
     ConflictException,
     Injectable,
-    InternalServerErrorException,
     NotFoundException,
     UnauthorizedException
 } from '@nestjs/common'
@@ -13,15 +13,18 @@ import { PrismaService } from '@/src/core/prisma/prisma.service'
 import { RedisService } from '@/src/core/redis/redis.service'
 import { PasswordService } from '@/src/modules/auth/account/services/password.service'
 import { LoginInput } from '@/src/modules/auth/session/inputs/login.input'
+import { VerificationService } from '@/src/modules/auth/verification/verification.service'
 import { getSessionMetadata } from '@/src/shared/utils/session-metadata.util'
+import { destroySession, saveSession } from '@/src/shared/utils/session.util'
 
 @Injectable()
 export class SessionService {
     public constructor(
         private readonly prisma: PrismaService,
         private readonly passwordService: PasswordService,
-        private readonly config: ConfigService,
-        private readonly redis: RedisService
+        private readonly configService: ConfigService,
+        private readonly redis: RedisService,
+        private readonly verificationService: VerificationService
     ) {}
 
     public async findByUser(req: Request) {
@@ -67,7 +70,7 @@ export class SessionService {
         const sessionId = req.session.id
 
         const sessionData = await this.redis.client.get(
-            this.config.getOrThrow('SESSION_FOLDER') + sessionId
+            this.configService.getOrThrow('SESSION_FOLDER') + sessionId
         )
 
         if (!sessionData) {
@@ -104,47 +107,25 @@ export class SessionService {
             throw new UnauthorizedException('Неверный логин или пароль')
         }
 
+        if (!user.isEmailVerified) {
+            await this.verificationService.sendVerificationToken(user)
+
+            throw new BadRequestException(
+                'Аккаунт не подтвержден, пожалуйста подтвердите свою почту.'
+            )
+        }
+
         const metadata = getSessionMetadata(req, userAgent)
 
-        return new Promise((resolve, reject) => {
-            req.session.userId = user.id
-            req.session.createdAt = new Date()
-            req.session.metadata = metadata
-
-            req.session.save(err => {
-                if (err) {
-                    reject(
-                        new InternalServerErrorException(
-                            'Не удалось сохранить сессию'
-                        )
-                    )
-                }
-
-                resolve(user)
-            })
-        })
+        return saveSession(req, user, metadata)
     }
 
     public logout(req: Request, res: Response) {
-        return new Promise((resolve, reject) => {
-            req.session.destroy(err => {
-                if (err) {
-                    reject(
-                        new InternalServerErrorException(
-                            'Не удалось удалить сессию'
-                        )
-                    )
-                }
-
-                res.clearCookie(this.config.getOrThrow<string>('SESSION_NAME'))
-
-                resolve(true)
-            })
-        })
+        return destroySession(req, res, this.configService)
     }
 
     public async clearSession(res: Response) {
-        res.clearCookie(this.config.getOrThrow<string>('SESSION_NAME'))
+        res.clearCookie(this.configService.getOrThrow<string>('SESSION_NAME'))
         return true
     }
 
@@ -154,7 +135,7 @@ export class SessionService {
         }
 
         await this.redis.client.del(
-            this.config.getOrThrow('SESSION_FOLDER') + id
+            this.configService.getOrThrow('SESSION_FOLDER') + id
         )
 
         return true
