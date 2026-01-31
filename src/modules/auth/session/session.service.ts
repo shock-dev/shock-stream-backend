@@ -13,6 +13,7 @@ import { PrismaService } from '@/src/core/prisma/prisma.service'
 import { RedisService } from '@/src/core/redis/redis.service'
 import { PasswordService } from '@/src/modules/auth/account/services/password.service'
 import { LoginInput } from '@/src/modules/auth/session/inputs/login.input'
+import { TotpFactory } from '@/src/modules/auth/totp/totp.factory'
 import { VerificationService } from '@/src/modules/auth/verification/verification.service'
 import { getSessionMetadata } from '@/src/shared/utils/session-metadata.util'
 import { destroySession, saveSession } from '@/src/shared/utils/session.util'
@@ -24,7 +25,8 @@ export class SessionService {
         private readonly passwordService: PasswordService,
         private readonly configService: ConfigService,
         private readonly redis: RedisService,
-        private readonly verificationService: VerificationService
+        private readonly verificationService: VerificationService,
+        private readonly totpFactory: TotpFactory
     ) {}
 
     public async findByUser(req: Request) {
@@ -86,7 +88,7 @@ export class SessionService {
     }
 
     public async login(req: Request, input: LoginInput, userAgent: string) {
-        const { login, password } = input
+        const { login, password, pin } = input
 
         const user = await this.prisma.user.findFirst({
             where: {
@@ -113,6 +115,20 @@ export class SessionService {
             throw new BadRequestException(
                 'Аккаунт не подтвержден, пожалуйста подтвердите свою почту.'
             )
+        }
+
+        if (user.isTotpEnabled && user.totpSecret) {
+            if (!pin) {
+                return { message: 'Необходим код для завершения авторизации' }
+            }
+
+            const totp = this.totpFactory.create(user, user.totpSecret)
+
+            const delta = totp.validate({ token: pin, window: 1 })
+
+            if (delta === null) {
+                throw new BadRequestException('Неверный код')
+            }
         }
 
         const metadata = getSessionMetadata(req, userAgent)

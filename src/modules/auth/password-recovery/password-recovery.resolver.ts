@@ -28,7 +28,6 @@ export class PasswordRecoveryResolver {
 
     @Mutation(() => Boolean, { name: 'setNewPassword' })
     public async setNewPassword(@Args('data') input: NewPasswordInput) {
-        console.log('test')
         return this.passwordRecoveryService.setNewPassword(input)
     }
 }
