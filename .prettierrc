@@ -3,14 +3,34 @@
   "trailingComma": "none",
   "tabWidth": 4,
   "semi": false,
-  "jsxSingleQuote": true,
   "arrowParens": "avoid",
 
-  "plugins": ["@trivago/prettier-plugin-sort-imports"],
-
-  "importOrder": ["<THIRD_PARTY_MODULES", "^@/(.*)$", "^../(.*)", "^./(.*)"],
-  "importOrderSeparation": true,
-  "importOrderSortSpecifiers": true,
-  "importOrderCaseInsensitive": true,
-  "importOrderParserPlugins" : ["classProperties", "decorators-legacy", "typescript"]
+  "overrides": [
+    {
+      "files": "*.ts",
+      "options": {
+        "plugins": ["@trivago/prettier-plugin-sort-imports"],
+        "importOrder": [
+          "<THIRD_PARTY_MODULES",
+          "^@/(.*)$",
+          "^../(.*)",
+          "^./(.*)"
+        ],
+        "importOrderSeparation": true,
+        "importOrderSortSpecifiers": true,
+        "importOrderCaseInsensitive": true,
+        "importOrderParserPlugins": [
+          "classProperties",
+          "decorators-legacy",
+          "typescript"
+        ]
+      }
+    },
+    {
+      "files": "*.tsx",
+      "options": {
+        "parser": "typescript"
+      }
+    }
+  ]
 }

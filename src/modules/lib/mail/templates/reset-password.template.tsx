@@ -8,16 +8,16 @@ import {
     Text,
     Link,
     Button,
-    Preview,
-} from '@react-email/components';
-import { Tailwind } from '@react-email/tailwind';
+    Preview
+} from '@react-email/components'
+import { Tailwind } from '@react-email/tailwind'
 
 interface ResetPasswordTemplateProps {
-    username: string;
-    resetUrl: string;
-    ip?: string;
-    device?: string;
-    location?: string;
+    username: string
+    resetUrl: string
+    ip?: string
+    device?: string
+    location?: string
 }
 
 export default function ResetPasswordTemplate({
@@ -25,7 +25,7 @@ export default function ResetPasswordTemplate({
     resetUrl,
     ip,
     device,
-    location,
+    location
 }: ResetPasswordTemplateProps) {
     return (
         <Html>
@@ -43,12 +43,17 @@ export default function ResetPasswordTemplate({
 
                         <Section className="mt-4">
                             <Text className="text-gray-700">
-                                Привет, <span className="font-semibold">{username}</span> 👋
+                                Привет,
+                                <span className="font-semibold">
+                                    {username}
+                                </span>
+                                👋
                             </Text>
 
                             <Text className="text-gray-700">
-                                Мы получили запрос на сброс пароля для вашего аккаунта.
-                                Если это были вы — нажмите кнопку ниже.
+                                Мы получили запрос на сброс пароля для вашего
+                                аккаунта. Если это были вы — нажмите кнопку
+                                ниже.
                             </Text>
                         </Section>
 
@@ -89,8 +94,8 @@ export default function ResetPasswordTemplate({
 
                         <Section className="mt-4">
                             <Text className="text-sm text-gray-500">
-                                Если вы не запрашивали сброс пароля, рекомендуем срочно
-                                сменить пароль и связаться с поддержкой.
+                                Если вы не запрашивали сброс пароля, рекомендуем
+                                срочно сменить пароль и связаться с поддержкой.
                             </Text>
                         </Section>
 
@@ -110,5 +115,5 @@ export default function ResetPasswordTemplate({
                 </Body>
             </Tailwind>
         </Html>
-    );
+    )
 }

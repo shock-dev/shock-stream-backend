@@ -1,4 +1,4 @@
-import React from 'react';
+import React from 'react'
 import {
     Html,
     Head,
@@ -8,18 +8,18 @@ import {
     Text,
     Link,
     Button,
-    Preview,
-} from '@react-email/components';
-import { Tailwind } from '@react-email/tailwind';
+    Preview
+} from '@react-email/components'
+import { Tailwind } from '@react-email/tailwind'
 
 interface VerificationTemplateProps {
-    username: string;
-    verifyUrl: string;
+    username: string
+    verifyUrl: string
 }
 
 export default function VerificationTemplate({
     username,
-    verifyUrl,
+    verifyUrl
 }: VerificationTemplateProps) {
     return (
         <Html>
@@ -37,12 +37,16 @@ export default function VerificationTemplate({
 
                         <Section className="mt-4">
                             <Text className="text-gray-700">
-                                Привет, <span className="font-semibold">{username}</span> 👋
+                                Привет,
+                                <span className="font-semibold">
+                                    {username}
+                                </span>
+                                👋
                             </Text>
 
                             <Text className="text-gray-700">
-                                Спасибо за регистрацию. Нажмите кнопку ниже, чтобы подтвердить
-                                адрес электронной почты.
+                                Спасибо за регистрацию. Нажмите кнопку ниже,
+                                чтобы подтвердить адрес электронной почты.
                             </Text>
                         </Section>
 
@@ -57,7 +61,8 @@ export default function VerificationTemplate({
 
                         <Section>
                             <Text className="text-sm text-gray-500">
-                                Если кнопка не работает, скопируйте и вставьте ссылку в браузер:
+                                Если кнопка не работает, скопируйте и вставьте
+                                ссылку в браузер:
                             </Text>
 
                             <Link
@@ -70,12 +75,13 @@ export default function VerificationTemplate({
 
                         <Section className="mt-6 border-t pt-4">
                             <Text className="text-xs text-gray-400 text-center">
-                                Если вы не регистрировались — просто проигнорируйте это письмо.
+                                Если вы не регистрировались — просто
+                                проигнорируйте это письмо.
                             </Text>
                         </Section>
                     </Container>
                 </Body>
             </Tailwind>
         </Html>
-    );
+    )
 }
