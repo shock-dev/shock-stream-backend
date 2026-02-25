@@ -5,6 +5,7 @@ import { NestExpressApplication } from '@nestjs/platform-express'
 import { RedisStore } from 'connect-redis'
 import cookieParser from 'cookie-parser'
 import session from 'express-session'
+import graphqlUploadExpress from 'graphql-upload/graphqlUploadExpress.js'
 import ms, { type StringValue } from 'ms'
 
 import { RedisService } from '@/src/core/redis/redis.service'
@@ -43,6 +44,8 @@ async function bootstrap() {
             })
         })
     )
+
+    app.use(config.getOrThrow<string>('GRAPHQL_PREFIX'), graphqlUploadExpress())
 
     app.useGlobalPipes(new ValidationPipe({ transform: true }))
 
